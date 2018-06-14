@@ -36,7 +36,7 @@ You need **python 2.x**, **pip** and **virtualenv** installed prior to installat
 2. If Windows:
 
     1. Create a virtual environemnt: `virtualenv modules`
-    2. Activate virtual environment: `source modules/bin/activate`
+    2. Activate virtual environment: `modules/Scripts/activate.bat`
     3. Install requirements: `pip install -r ./requirements.txt`
     4. To deactivate virtual by: `deactivate`
 
