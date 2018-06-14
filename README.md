@@ -46,6 +46,13 @@ You need **python 2.x**, **pip** and **virtualenv** installed prior to installat
 
 1. Activate virtual environment: `source modules/bin/active`
 2. Run: `python Telemetry.py`
+2. If Windows: 
+    1. Open Command Prompt and go to Telemetry folder: `cd Telemetry`
+
+    2. Activate virtual environment: `modules\Scripts\activate.bat`
+
+    3. Run: `python Telemetry.py`
+
 3. **Done!** At this point, on Mac and Linux, your default browswer should have opened a new URL with telemetry in it. On windows enter `http://localhost:5001/` into your browser of choice.
 # Change Log
 
