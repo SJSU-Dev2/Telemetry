@@ -19,7 +19,7 @@
  #
 
 from __future__ import division
-from flask import Flask, render_template, send_from_directory, abort
+from flask import Flask, render_template, send_from_directory, abort, request
 import threading
 import serial
 import serial.tools.list_ports
@@ -198,14 +198,14 @@ def list():
     return json.dumps(ports)
 
 # Connect serial to device and return success
-@app.route('/connect')
-@app.route('/connect/<string:device>')
-def connect(device):
+@app.route('/connect', methods=['GET'])
+def connect():
     global serial_output
     global state
+    device = request.args.get('device')
     ser.close()
     serial_output = ""
-    ser.port = "/dev/" + device
+    ser.port = device
     state = State.SYSTEM_BOOTING
     ser.open()
     return SUCCESS

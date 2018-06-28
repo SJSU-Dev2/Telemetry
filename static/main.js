@@ -187,14 +187,14 @@ $("#connect").on("click", () =>
 {
     if(!device_connected)
     {
-        var device_select = $("#device-select").val();
-        if(device_select == "-1")
+        var device = $("#device-select").val();
+        if(device == "-1")
         {
+            alert("Invalid serial device.");
+            /* TODO: should show a model stating that connecting failed */
             return;
         }
-        device = device_select.substr(5);
-        // var dev_str = (device_number === -1) ? '' : `/${device_number}`;
-        $.get(`${URL}/connect/${device}`, function( data )
+        $.get(`${URL}/connect?device=${device}`, function( data )
         {
             if(data === SUCCESS)
             {
@@ -204,6 +204,11 @@ $("#connect").on("click", () =>
                     .addClass("btn-outline-danger")
                     .text("Disconnect");
                 $("#serial-baud-select").attr("disabled", "disabled");
+            }
+            else 
+            {
+                /* TODO: should show a model stating that connecting failed */
+                alert("Couldn't connect to device.");
             }
         });
     }
