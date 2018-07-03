@@ -124,6 +124,11 @@ hr
   color: red;
   content: "server disconnected";
 }
+
+.clear-btn
+{
+  height: calc(2.25rem + 2px);
+}
 .supsub {position: absolute}
 .subscript {display:block; position:relative; left:5px; top: 23px}
 .superscript {display:block; position:relative; left:5px; top: 7px}

@@ -188,6 +188,7 @@ $("#connect").on("click", () =>
     if(!device_connected)
     {
         var device = $("#device-select").val();
+        console.log(device);
         if(device == "-1")
         {
             alert("Invalid serial device.");
@@ -328,6 +329,12 @@ $("#serial-baud-select").on("change", () =>
         if(data === SUCCESS) {}
     });
     setCookie("serial-baud-select", val, 30);
+});
+
+//EVAN ADDED BUTTON CODE HERE
+$("#clear-button").on("click", () =>
+{
+     $("#serial-output").val("");
 });
 
 $("#graph-frequency-select").on("change", () =>
