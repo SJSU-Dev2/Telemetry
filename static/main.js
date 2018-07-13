@@ -322,10 +322,10 @@ $("#serial-baud-select").on("change", () =>
     setCookie("serial-baud-select", val, 30);
 });
 
-//EVAN ADDED BUTTON CODE HERE
+//Clear Button Code
 $("#clear-button").on("click", () =>
 {
-     $("#serial-output").val("");
+    term.write("\x1b[H\x1b[2J");
 });
 
 $("#graph-frequency-select").on("change", () =>
