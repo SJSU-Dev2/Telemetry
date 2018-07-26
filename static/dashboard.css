@@ -129,6 +129,12 @@ hr
 {
   height: calc(2.25rem + 2px);
 }
+
+.modal-lg 
+{
+  max-width: 80%;
+}
+
 .supsub {position: absolute}
 .subscript {display:block; position:relative; left:5px; top: 23px}
 .superscript {display:block; position:relative; left:5px; top: 7px}
