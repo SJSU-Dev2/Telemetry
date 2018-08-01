@@ -52,22 +52,12 @@
         <div class="collapse navbar-collapse" id="navbarsExampleDefault">
             <ul class="navbar-nav mr-auto"></ul>
             <div class="form-inline mt-2 mt-md-0">
-                    <button class="btn btn-outline-info help-btn" data-toggle="modal" data-target="#helpModal" style="margin-right: 15px;">
-                            Help
-                        </button>
-                <label class="form-check-label" style="margin-right: 15px; color: white;">
-                    <input class="form-check-input" type="checkbox" value="telemetry" id="graph-switch">
-                    Graph
-                </label>
-                <label class="form-check-label" style="margin-right: 15px; color: white;">
-                    <input class="form-check-input" type="checkbox" value="telemetry" id="telemetry-on">
-                    Telemetry
-                </label>
-                <label class="form-check-label" style="margin-right: 15px; color: white;">
-                    <input class="form-check-input" disabled type="checkbox" value="reset" id="reset-on-connect" checked>
-                    Reset On Connect
-                </label>
-                <button id="clear-cache-modal-open" class="btn btn-outline-danger clear-btn" style="margin-right: 10px;">Clear Command History</button>
+                <button class="btn btn-outline-primary help-btn" data-toggle="modal" data-target="#helpModal" style="margin-right: 15px;">
+                        Help
+                    </button>
+                <button class="btn btn-outline-info" data-toggle="modal" data-target="#optionsModal" style="margin-right: 15px;">
+                       Options
+                </button>
                 <button class="btn btn-outline-info my-2 my-sm-0" style="margin-right: 10px;" id="refresh" type="submit">Refresh Devices</button>
                 <select class="custom-select mb-2 mr-sm-2 mb-sm-0" id="device-select">
                     <option value="-1" selected>Select Serial Device ...</option>
@@ -76,55 +66,87 @@
             </div>
         </div>
     </nav>
-        <!-- Help Modal -->
-<div id="helpModal" class="modal fade" role="dialog">
-    <div class="modal-dialog modal-lg">
-  
-        <div class="modal-content">
-            <div class="modal-header">
-            <h4 class="modal-title">How to Use Telemetry</h4>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <!-- Options Modal-->
+    <div id = "optionsModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+               <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Options</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="btn-group-vertical">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" value="telemetry" id="graph-switch">
+                                Graph
+                            </label>
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" value="telemetry" id="telemetry-on">
+                                Telemetry
+                            </label>
+                            <label class="form-check-label">
+                                <input class="form-check-input" disabled type="checkbox" value="reset" id="reset-on-connect" checked>
+                                Reset On Connect
+                            </label>
+                            <button id="clear-cache-modal-open" class="btn btn-outline-danger clear-btn">
+                                Clear Command History
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="modal-body">
-            <h4>Connecting Your Device</h4>
-            <ol>
-                <li>Connect device to USB port</li>
-                <li>Press "Refresh Devices" on navbar to update list of devices connected</li>
-                <li>Using the dropdown menu next to the connect button, connect to the 
-                    corresponding COM or TTY serial device number and press Connect.</li>
-            </ol>
-            <h4>Serial Frequency Select</h4>
-            <ul>
-                <li>Use this to select which serial speed (baud) you would like to use for your device</li>
-            </ul>
-            <h4>Serial Baud Select</h4>
-            <ul>
-                <li>Baud rates select the rate at which bits are sent and received from Telemetry 
-                to your device.</li>
-                <li> 1 Baud represents one bit of information transferred per second.</li>
-            </ul>
-            <h4>Carriage Return (CR) and New Line (NL) Selectors</h4>
-            <ul> 
-                <li>Having CR checked sends a carriage return command at the end of your string of text.</li>
-                <li>Having NL checked sends a new line command at the end of your string of text.</li>
-            </ul>
-            <h4>Telemetry Selector</h4>
-            <ul>
-                <li>Having Telemetry checked enables the Telemetry features, and allows you to interact with your 
-                    variables in real time.</li>
-            </ul>
-            <h4>Graph Selector</h4>
-            <ul>
-                <li>Having Graph checked enables data sent from your device to be graphed in real time.</li>
-            </ul>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        </div>
-      </div>
-  
     </div>
-  </div>
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+    
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">How to Use Telemetry</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <h4>Connecting Your Device</h4>
+                    <ol>
+                        <li>Connect device to USB port</li>
+                        <li>Press "Refresh Devices" on navbar to update list of devices connected</li>
+                        <li>Using the dropdown menu next to the connect button, connect to the 
+                            corresponding COM or TTY serial device number and press Connect.</li>
+                    </ol>
+                    <h4>Serial Frequency Select</h4>
+                    <ul>
+                        <li>Use this to select which serial speed (baud) you would like to use for your device</li>
+                    </ul>
+                    <h4>Serial Baud Select</h4>
+                    <ul>
+                        <li>Baud rates select the rate at which bits are sent and received from Telemetry 
+                        to your device.</li>
+                        <li> 1 Baud represents one bit of information transferred per second.</li>
+                    </ul>
+                    <h4>Carriage Return (CR) and New Line (NL) Selectors</h4>
+                    <ul> 
+                        <li>Having CR checked sends a carriage return command at the end of your string of text.</li>
+                        <li>Having NL checked sends a new line command at the end of your string of text.</li>
+                    </ul>
+                    <h4>Telemetry Selector</h4>
+                    <ul>
+                        <li>Having Telemetry checked enables the Telemetry features, and allows you to interact with your 
+                            variables in real time.</li>
+                    </ul>
+                    <h4>Graph Selector</h4>
+                    <ul>
+                        <li>Having Graph checked enables data sent from your device to be graphed in real time.</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+  
+        </div>
+    </div>
     <div class="container-fluid pt-4" style="height: 100%">
         <div class="row" style="height: 97.5%">
             <main class="col-sm-12 col-md-12 col-lg-5">
