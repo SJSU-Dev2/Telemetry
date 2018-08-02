@@ -135,6 +135,40 @@ hr
   max-width: 80%;
 }
 
+.help-btn { 
+  color: #ffe817; 
+  border-color: #ffe817; 
+  background-color: #292b2c;
+} 
+ 
+.help-btn:hover, 
+.help-btn:focus,  
+.help-btn.active
+{ 
+  outline: none !important;
+  box-shadow: none;
+  color: #000000; 
+  background-color: #ffe817; 
+  border-color: #ffe817; 
+} 
+ 
+.options-btn{
+  color: #cacaca; 
+  border-color: #cacaca; 
+  background-color: #292b2c;
+}
+
+.options-btn:hover, 
+.options-btn:focus,  
+.options-btn.active
+{ 
+  outline: none !important;
+  box-shadow: none;
+  color: #000000; 
+  background-color: #cacaca; 
+  border-color: #cacaca; 
+} 
+
 .supsub {position: absolute}
 .subscript {display:block; position:relative; left:5px; top: 23px}
 .superscript {display:block; position:relative; left:5px; top: 7px}
