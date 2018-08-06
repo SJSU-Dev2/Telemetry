@@ -9,16 +9,15 @@ matrix:
             - "3.3"
             - "3.4"
             - "3.5"
-            - "3.5-dev" # 3.5 development branch
             - "3.6"
-            - "3.6-dev" # 3.6 development branch
-            - "3.7-dev" # 3.7 development branch
-            - "nightly"
           sudo: true
           dist: trusty
           group: edge
           before_install: sudo apt install python-pip
         - os: osx
+          before_install:
+            - sudo easy_install pip
+            - sudo -H pip install --upgrade pip
 install:
   - pip install virtualenv
   - ./setup
@@ -26,4 +25,3 @@ script:
   - ./telemetry &
   - sleep 2
   - wget http://localhost:5001
-# after_success:
