@@ -325,7 +325,11 @@ $("#serial-baud-select").on("change", () =>
 //Clear Button Code
 $("#clear-button").on("click", () =>
 {
-    term.write("\x1b[H\x1b[2J");
+    // [0m = Reset color codes
+    // [3J = Remove terminal buffer
+    // [2J = Clear screen
+    // [H  = Return to home (0,0)
+    term.write("\x1b[0m\x1b[3J\x1b[2J\x1b[H");
 });
 
 //Command History Code
