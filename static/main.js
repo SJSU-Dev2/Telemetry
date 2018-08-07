@@ -710,7 +710,7 @@ var term = new Terminal({
     cursorBlink: true,
     lineHeight: 1,
     fontFamily: "monospace",
-    scrollback: 2^16,
+    scrollback: 1024,
 });
 
 $(window).resize(() => {
