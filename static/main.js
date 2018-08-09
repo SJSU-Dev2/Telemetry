@@ -353,10 +353,55 @@ $("#graph-frequency-select").on("change", () =>
     setCookie("graph-frequency-select", val, 30);
 });
 
-$('#telemetry-on').on('change', function()
+$('#telemetry-on').on('change click', function(e)
 {
     telemetry_flag = $(this).is(":checked");
     setCookie("telemetry-on", telemetry_flag, 30);
+
+    var telemetry_feedback_section = $("#telemetry-feedback-section");
+    var serial_output_section = $("#serial-output-section");
+    var invisible_block = $('#invisible-layer');
+    const serial_output_expand = "col-sm-12 col-md-12 col-lg-12";
+    const invisible_layer_expand = "col-sm-12 col-md-12 col-lg-11";
+    const serial_output_shrink = "col-sm-12 col-md-12 col-lg-5";
+    const telemetry_feedback_size = "col-sm-12 col-md-12 col-lg-7";
+    const REFIT_TIME_DELAY = 541;
+
+    if(e.type == 'change'){
+        serial_output_section.css('visibility', 'visible');
+
+        if(!telemetry_flag)
+        {   
+            serial_output_section.removeClass(serial_output_shrink).addClass(serial_output_expand);
+            invisible_block.removeClass(serial_output_shrink).addClass(invisible_layer_expand);
+            telemetry_feedback_section.removeClass(telemetry_feedback_size).addClass('col-lg-1');
+        }
+        else
+        {
+           telemetry_feedback_section.find("input").attr("required", true);
+           serial_output_section.removeClass(serial_output_expand).addClass(serial_output_shrink);
+           invisible_block.removeClass(invisible_layer_expand).addClass(serial_output_shrink);
+           telemetry_feedback_section.css('visibility', 'visible').removeClass("col-lg-1").addClass(telemetry_feedback_size);
+        }
+        setTimeout(function(){
+            term.fit();
+        }, REFIT_TIME_DELAY);
+    }
+    else if(e.type = 'click')
+    {
+        if(!telemetry_flag)
+        {   
+           serial_output_section.css('transition', '0.52s ease-in');
+            invisible_block.css('transition', '0.5s ease-in');
+            telemetry_feedback_section.css('transition', '0.5s ease-in').hide(540); 
+        }
+        else
+        {
+           serial_output_section.css('transition', '0.449s ease-in');
+           invisible_block.css('transition', '0.5s ease-in');
+           telemetry_feedback_section.show().css('transition', '0.5s ease-in');
+        }    
+    }
 });
 
 $('#reset-on-connect').on('change', function()

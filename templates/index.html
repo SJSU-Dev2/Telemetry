@@ -149,7 +149,7 @@
     </div>
     <div class="container-fluid pt-4" style="height: 100%">
         <div class="row" style="height: 97.5%">
-            <main class="col-sm-12 col-md-12 col-lg-5">
+            <main class="col-sm-12 col-md-12 col-lg-5" id="serial-output-section" style="z-index: 1; position: absolute;">
                 <div style="display: inherit;">
                     <h2>Serial Output</h2>
                     <select style="margin-left: 15px" class="custom-select mb-2 mr-sm-2 mb-sm-0" id="serial-frequency-select">
@@ -193,7 +193,8 @@
                 <button id="clear-button" class="btn btn-outline-warning clear-btn">Clear Console</button>
                 <textarea disabled id="serial-output" style="display:none" class="form-control fill"></textarea>
             </main>
-            <main class="col-sm-12 col-md-12 col-lg-7">
+            <main class="col-sm-12 col-md-12 col-lg-5" id="invisible-layer"></main>
+            <main class="col-sm-12 col-md-12 col-lg-1" id="telemetry-feedback-section">
                 <div style="display: inherit;">
                     <h2>Telemetry Feedback</h2>
                     <select style="margin-left: 15px" class="custom-select mb-2 mr-sm-2 mb-sm-0" id="telemetry-frequency-select">
@@ -225,7 +226,7 @@
                 <br>
                 <div class="tab-content" style="height: 0%; flex-grow: 0.95; overflow-y: auto;">
                     <div class="tab-pane active" id="table" role="tabpanel" style="height:96%;">
-                        <div class="table-responsive" style="height:100%">
+                        <div class="table-responsive" style="height:100%; overflow: hidden;">
                             <table id="telemetry-table" class="table table-striped">
                                 <thead>
                                     <tr>
