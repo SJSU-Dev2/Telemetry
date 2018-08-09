@@ -419,8 +419,6 @@ $('#telemetry-on').on('change click', function(e)
     const REFIT_TIME_DELAY = 541;
 
     if(e.type == 'change'){
-        serial_output_section.css('visibility', 'visible');
-
         if(!telemetry_flag)
         {   
             serial_output_section.removeClass(serial_output_shrink).addClass(serial_output_expand);
@@ -858,11 +856,21 @@ window.onload = function()
         getTelemetry();
         getCache();
         $("#refresh").click();
+
+        $("#telemetry-feedback-section").css('display', '');
         //// TODO: Convert the items below into a for loop
         if(checkCookie('telemetry-on'))
-        {
+        {   
             $("#telemetry-on").prop("checked", getCookie("telemetry-on") === "true");
             $("#telemetry-on").change();
+            if(!telemetry_flag)
+            {
+                $("#telemetry-feedback-section").css('visibility', 'hidden');
+            }
+            else
+            {
+                $("#telemetry-feedback-section").css('visibility', 'visible');
+            }
         }
         if(checkCookie("reset-on-connect"))
         {
