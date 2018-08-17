@@ -91,6 +91,7 @@ var server_connected    = false;
 var graph_update_active = false;
 var telemetry_flag      = false;
 var carriage_return_active = false;
+var darktheme_active    = false;
 var newline_active      = true;
 var scrolled_to_bottom  = true;
 /*** Structures ***/
@@ -475,6 +476,18 @@ $('#newline-select').on('change', function()
 {
     newline_active = $(this).is(":checked");
     setCookie("newline-active", newline_active, 30);
+});
+
+$("#dark-theme").on('change', function()
+{
+    darktheme_active = $(this).is(":checked");
+    setCookie("darktheme-active", darktheme_active, 30);
+    if(darktheme_active){
+        $('head').append('<link rel="stylesheet" type="text/css" id="dark-style" href="static/lib/themes/dark-theme.css" >');
+    }else{
+        var item = document.getElementById("dark-style");
+        item.parentNode.removeChild(item);
+    }
 });
 
 //===================================
@@ -886,6 +899,11 @@ window.onload = function()
         {
             $("#newline-select").prop("checked", getCookie("newline-active") === "true");
             $("#newline-select").change();
+        }
+        if(checkCookie("darktheme-active"))
+        {
+            $("#dark-theme").prop("checked", getCookie("darktheme-active") === "true");
+            $("#dark-theme").change();
         }
         if(checkCookie("serial-frequency-select"))
         {
