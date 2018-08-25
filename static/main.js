@@ -84,6 +84,7 @@ const ENTER_KEY         = 13;
 /*** Strings ***/
 var serial              = "";
 var telemetry_raw       = "";
+var past_commands       = "";
 /*** Flags ***/
 var table_init          = false;
 var device_connected    = false;
@@ -263,6 +264,8 @@ $("#serial-send").on("click", () =>
         if(payload !== command_history[command_history.length-1])
         {
             command_history.push(payload);
+            past_commands += '<option value="'+command_history[command_history.length - 1]+'" />';
+            document.getElementById('command-history').innerHTML = past_commands;
         }
         history_position = 0;
 
@@ -341,6 +344,8 @@ $("#clear-cache-modal-open").on("click",() =>
 $("#clear-cache").on("click", () =>
 {
   command_history = [];
+  past_commands = ""; 
+  document.getElementById('command-history').innerHTML = "";
   localStorage.setItem('command_history', JSON.stringify(command_history));
   console.info("CLEARED COMMAND HISTORY AND CACHE");
 });
@@ -775,6 +780,11 @@ function getCache()
   {
     var get_storage = JSON.parse(localStorage.getItem('command_history'));
     command_history = get_storage;
+    for(var i = 0; i < command_history.length; i++)
+    {
+        past_commands += '<option value="'+command_history[i]+'" />';
+    }
+    document.getElementById('command-history').innerHTML = past_commands;
     console.info("COMMAND CACHE RETRIEVED");
   }
 

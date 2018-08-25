@@ -181,7 +181,8 @@
                 </div>
                 <hr>
                 <div class="input-group" style="margin-bottom: 10px">
-                    <input type="text" class="form-control" placeholder="Write Serial Data Here ..." name="serial-input">
+                    <input type="text" class="form-control" list="command-history" placeholder="Write Serial Data Here ..." name="serial-input">
+                    <datalist id="command-history"></datalist>
                     <span class="input-group-addon">
                         <input type="checkbox" id="carriage-return-select"> <span>&nbsp;CR</span>
                     </span>
