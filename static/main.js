@@ -159,7 +159,7 @@ function checkCookie(cookie)
 $("#refresh").on("click", () =>
 {
     console.log(`${URL}/list`);
-    $.get(`${URL}/list`, function( data )
+    $.get(`${URL}/list`, function(data)
     {
         var new_list = [];
         if(data)
@@ -187,7 +187,7 @@ $("#connect").on("click", () =>
             /* TODO: should show a model stating that connecting failed */
             return;
         }
-        $.get(`${URL}/connect?device=${device}`, function( data )
+        $.get(`${URL}/connect?device=${device}`, function(data)
         {
             if(data === SUCCESS)
             {
@@ -207,7 +207,7 @@ $("#connect").on("click", () =>
     }
     else
     {
-        $.get(`${URL}/disconnect`, function( data )
+        $.get(`${URL}/disconnect`, function(data)
         {
             if(data === SUCCESS)
             {
@@ -270,7 +270,7 @@ $("#serial-send").on("click", () =>
         var cr = (carriage_return_active) ? "1" : "0";
         var nl = (newline_active) ? "1" : "0";
 
-        $.get(`${URL}/write/${payload}/${cr}/${nl}`, function( data )
+        $.get(`${URL}/write/${payload}/${cr}/${nl}`, function(data)
         {
             if(data === SUCCESS)
             {
@@ -316,7 +316,7 @@ $("#telemetry-frequency-select").on("change", () =>
 $("#serial-baud-select").on("change", () =>
 {
     var val = $("#serial-baud-select").val();
-    $.get(`${URL}/baudrate/${val}`, function( data )
+    $.get(`${URL}/baudrate/${val}`, function(data)
     {
         if(data === SUCCESS) {}
     });
@@ -371,7 +371,7 @@ $("#serial-upload").on("click", () =>
           method: "POST",
           headers: {'Content-Type': 'application/json'},
           data: JSON.stringify(output),
-          success: function( data )
+          success: function(data)
           {
             if (data === SUCCESS)
             {
@@ -405,6 +405,24 @@ $("#graph-frequency-select").on("change", () =>
     setCookie("graph-frequency-select", val, 30);
 });
 
+$('#rts-control').on('change click', function(e)
+{
+    var rts_flag = $(this).is(":checked");
+    $.get(`${URL}/rts/${rts_flag}`, function(data)
+    {
+        if(data === SUCCESS) {}
+    });
+});
+
+$('#dtr-control').on('change click', function(e)
+{
+    var dtr_flag = $(this).is(":checked");
+    $.get(`${URL}/dtr/${dtr_flag}`, function(data)
+    {
+        if(data === SUCCESS) {}
+    });
+});
+
 $('#telemetry-on').on('change click', function(e)
 {
     telemetry_flag = $(this).is(":checked");
@@ -421,7 +439,7 @@ $('#telemetry-on').on('change click', function(e)
 
     if(e.type == 'change'){
         if(!telemetry_flag)
-        {   
+        {
             serial_output_section.removeClass(serial_output_shrink).addClass(serial_output_expand);
             invisible_block.removeClass(serial_output_shrink).addClass(invisible_layer_expand);
             telemetry_feedback_section.removeClass(telemetry_feedback_size).addClass('col-lg-1');
@@ -440,17 +458,17 @@ $('#telemetry-on').on('change click', function(e)
     else if(e.type = 'click')
     {
         if(!telemetry_flag)
-        {   
+        {
            serial_output_section.css('transition', '0.52s ease-in');
             invisible_block.css('transition', '0.5s ease-in');
-            telemetry_feedback_section.css('transition', '0.5s ease-in').hide(540); 
+            telemetry_feedback_section.css('transition', '0.5s ease-in').hide(540);
         }
         else
         {
            serial_output_section.css('transition', '0.449s ease-in');
            invisible_block.css('transition', '0.5s ease-in');
            telemetry_feedback_section.show().css('transition', '0.5s ease-in');
-        }    
+        }
     }
 });
 
@@ -497,7 +515,7 @@ $("#dark-theme").on('change', function()
 function telemetrySet(bucket, element)
 {
     var new_value = $(`input[name="set-${bucket}-${element}"]`).val();
-    $.get(`${URL}/set/${bucket}/${element}/${new_value}`, function( data )
+    $.get(`${URL}/set/${bucket}/${element}/${new_value}`, function(data)
     {
         if(data === SUCCESS) {}
     });
@@ -837,7 +855,7 @@ term.on('key', function (key, ev) {
     {
         key += "\n";
     }
-    $.get(`${URL}/write/${encodeURI(key)}/0/0`, function( data )
+    $.get(`${URL}/write/${encodeURIComponent(key)}/0/0`, function(data)
     {
         if(data === SUCCESS)
         {
@@ -873,7 +891,7 @@ window.onload = function()
         $("#telemetry-feedback-section").css('display', '');
         //// TODO: Convert the items below into a for loop
         if(checkCookie('telemetry-on'))
-        {   
+        {
             $("#telemetry-on").prop("checked", getCookie("telemetry-on") === "true");
             $("#telemetry-on").change();
             if(!telemetry_flag)

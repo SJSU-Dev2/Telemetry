@@ -267,6 +267,18 @@ def serial_file():
     lock.release()
     return SUCCESS
 
+# RTS control signal control
+@app.route('/rts/<string:is_on>')
+def rts(is_on):
+    ser.rts = True if (is_on == "true") else False
+    return SUCCESS
+
+# DTR control signal control
+@app.route('/dtr/<string:is_on>')
+def dtr(is_on):
+    ser.dtr = True if (is_on == "true") else False
+    return SUCCESS
+
 if __name__ == "__main__":
     port = 5001
     if len(sys.argv) == 2:
