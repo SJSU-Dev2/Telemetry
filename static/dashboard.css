@@ -170,6 +170,12 @@ hr
   border-color: #cacaca; 
 } 
 
+.download-btn
+{
+  border-color: #cacaca; 
+  background-color: #cacaca;
+}
+
 .supsub {position: absolute}
 .subscript {display:block; position:relative; left:5px; top: 23px}
 .superscript {display:block; position:relative; left:5px; top: 7px}
