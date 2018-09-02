@@ -92,6 +92,7 @@ var server_connected    = false;
 var graph_update_active = false;
 var telemetry_flag      = false;
 var carriage_return_active = false;
+var auto_connect_active  = true;
 var darktheme_active    = false;
 var newline_active      = true;
 var scrolled_to_bottom  = true;
@@ -189,6 +190,17 @@ $("#refresh").on("click", () =>
                 console.log(new_list);
             } catch(e) { }
             var list_html = generateDropDownList(new_list);
+            if(auto_connect_active){
+                if($("#device-select").val().length < list_html.length){
+                    var desiredDevice = localStorage.getItem("autoConnectPort");
+                    for (var i = 0; i < new_list.length; i++) { 
+                        if(new_list[i] === desiredDevice){
+                            $("#device-select").val(desiredDevice);
+                            $("#connect").click();
+                        }
+                    }
+                }
+            }
             $("#device-select").html(list_html);
         }
     });
@@ -217,6 +229,9 @@ $("#connect").on("click", () =>
                     .text("Disconnect");
                 $("#serial-baud-select").attr("disabled", "disabled");
                 disableGraphDownload(false);
+                if(auto_connect_active){
+                    localStorage.setItem("autoConnectPort", device);
+                }
             }
             else
             {
@@ -344,6 +359,12 @@ $("#serial-baud-select").on("change", () =>
         if(data === SUCCESS) {}
     });
     setCache("serial-baud-select", val);
+});
+
+$('#auto-connect-switch').on('change', function()
+{
+    auto_connect_active = $(this).is(":checked");
+    setCookie("auto-connect-switch", auto_connect_active, 30);
 });
 
 //Clear Button Code
@@ -834,6 +855,15 @@ function checkConnection()
     });
 }
 
+function autoConnectDevice()
+{
+    if(auto_connect_active)
+    {
+        $("#refresh").click();
+    }
+    setTimeout(autoConnectDevice,1000);
+}
+
 //===================================
 //  Initialize everything
 //===================================
@@ -899,6 +929,8 @@ window.onload = function()
         getSerial();
         getTelemetry();
         getCommandCache();
+        autoConnectDevice();
+        getCache();
         $("#refresh").click();
 
         $("#telemetry-feedback-section").css('display', '');
@@ -952,6 +984,12 @@ window.onload = function()
             $("#graph-switch").change();
         }
         if(checkCache("graph-frequency-select"))
+        if(checkCookie("auto-connect-switch"))
+        {
+            $("#auto-connect-switch").prop("checked", getCookie("auto-connect-switchh") === "true");
+            $("#auto-connect-switch").change();
+        }
+        if(checkCookie("graph-frequency-select"))
         {
             $("#graph-frequency-select").val(getCache("graph-frequency-select"));
             $("#graph-frequency-select").change();
