@@ -158,6 +158,12 @@
                     <ul>
                         <li>Having Graph checked enables data sent from your device to be graphed in real time.</li>
                     </ul>
+                    <h4>DTR and RTS Control</h4>
+                    <ul>
+                        <li>Having the DTR option checked resets your device, and holds it in a reset mode until unchecked.</li>
+                        <li>Having the RTS option checked sends a "Request To Send" signal to your device to verify it is ready to receive data.</li>
+                        <li>Asserting the RTS signal for the SJOne and SJTwo boards asserts the NMI signal, which will put the board into factor bootloader mode.</li>
+                    </ul>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
