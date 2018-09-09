@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+    <title>[TESTER] Web Serial Adapter </title>
+    <script>
+        const EXTENSION_ID = "fmknhfahjnejmacfdpabmgembcgidplm";
+        var port = chrome.runtime.connect(EXTENSION_ID, { name: "serial" });
+        port.onMessage.addListener(function(response) {
+            console.log(response);
+        });
+        console.log(port);
+
+        function connect()
+        {
+            port.postMessage({
+                command: "connect",
+                data:
+                {
+                    port_index: 0,
+                    settings: { bitrate: 38400 }
+                }
+            });
+        }
+        function disconnect()
+        {
+            port.postMessage({ command: "disconnect", data: ""});
+        }
+        function control()
+        {
+            port.postMessage({ command: "control", data: { dtr: false, rts: false } });
+        }
+        function list()
+        {
+            port.postMessage({ command: "list", data: {} });
+        }
+        function update()
+        {
+            port.postMessage({ command: "update", data: { bitrate: 38400 }});
+        }
+        function read()
+        {
+            port.postMessage({ command: "read", data: {}});
+        }
+    </script>
+</head>
+<body>
+    <div>
+        <button onclick="connect();">connect</button>
+        <button onclick="disconnect();">disconnect</button>
+        <button onclick="read();">read</button>
+        <button onclick="control();">control</button>
+        <button onclick="list();">list</button>
+        <button onclick="update();">update</button>
+        <button onclick="chrome.tabs.create('chrome://extensions');">chrome extensions</a>
+    </div>
+</body>
+</html>

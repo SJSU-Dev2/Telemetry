@@ -1,0 +1,127 @@
+html 
+{ 
+  background-color: #212127; 
+} 
+
+html, body, input, textarea, select, button 
+{ 
+  background-color: #212127; 
+} 
+
+html, body, input, textarea, select, button 
+{ 
+  border-color: #5e5d5a;
+  color: #e9e3d5; 
+} 
+
+a 
+{ 
+  color: #446be4; 
+} 
+
+table 
+{ 
+  border-color: #545351; 
+} 
+
+.form-control::-webkit-input-placeholder 
+{
+  color: #d5d5d5;
+}
+
+.btn-default
+{
+  border-color: gray;
+}
+
+.form-control::placeholder 
+{
+  color: #d5d5d5;
+}
+
+::selection 
+{ 
+  background-color: #1760b9; 
+  color: #fbf7f1; 
+} 
+
+::-moz-selection 
+{ 
+  background-color: #1760b9; 
+  color: #fbf7f1; 
+} 
+
+input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill 
+{ 
+  background-color: #5b5f13; 
+  color: #e9e3d5; 
+} 
+
+::-webkit-scrollbar 
+{ 
+  background-color: #25252a; 
+  color: #ccc0ac; 
+} 
+
+::-webkit-scrollbar-thumb 
+{ 
+  background-color: #303339; 
+} 
+
+::-webkit-scrollbar-thumb:hover 
+{ 
+  background-color: #373a42; 
+} 
+
+::-webkit-scrollbar-thumb:active 
+{ 
+  background-color: #40464e; 
+} 
+
+::-webkit-scrollbar-corner 
+{ 
+  background-color: #212127; 
+}
+
+.custom-select 
+{
+  background-color: #8c8c8c; 
+  color: white;
+} 
+
+.input-group-addon 
+{
+  border-color: gray;
+  background-color: #212127; 
+  color: white;
+} 
+
+.form-control 
+{
+  border-color: gray;
+  background-color: #212127; 
+  color: white;
+} 
+
+.form-control:focus 
+{
+  background-color: #212127; 
+  color: white;
+} 
+
+.form-control:disabled 
+{
+  background-color: #20202A !important; 
+  color: white;
+} 
+
+.modal-content 
+{
+  background-color: #212127 !important;
+} 
+
+.nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active
+{
+  background-color: #20202A !important; 
+  color: white;
+}

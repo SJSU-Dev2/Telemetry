@@ -1,0 +1,19 @@
+{
+    "name": "Serial",
+    "description": "Serial chrome Test App",
+    "version": "0.1",
+    "manifest_version": 2,
+    "app": {
+        "background": {
+            "scripts": ["background.js"]
+        }
+    },
+    "permissions": ["serial"],
+    "externally_connectable": {
+        "ids": ["*"],
+        "matches": [
+          "http://localhost:8080/*",
+          "https://kammce.github.io/Telemetry/*"
+        ]
+    }
+}

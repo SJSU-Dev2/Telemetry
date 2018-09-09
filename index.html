@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <link rel="icon"
+    href="">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="author"
+    content="Khalil A. Estell">
+  <meta name="description"
+    content="Web Interface to display and modify firmware variables within the SJOne Development board.">
+  <title>SJOne Telemetry</title>
+  <!-- xterm.js stylesheet-->
+  <link rel="stylesheet"
+    type="text/css"
+    href="web-app-resources/lib/xterm/dist/xterm.css">
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet"
+    type="text/css"
+    href="web-app-resources/lib/bootstrap-4.0.0-alpha.6/css/bootstrap.min.css">
+  <!-- Custom styles for this template -->
+  <link rel="stylesheet"
+    type="text/css"
+    href="web-app-resources/dashboard.css">
+</head>
+
+<body>
+  <nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
+    <button class="navbar-toggler navbar-toggler-right hidden-lg-up"
+      type="button"
+      data-toggle="collapse"
+      data-target="#navbarsExampleDefault"
+      aria-controls="navbarsExampleDefault"
+      aria-expanded="false"
+      aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand"
+      href="#"> Telemetry <span class='supsub'>
+        <sup class='superscript'>version 1.2</sup>
+      </span>
+      <button class="btn btn-outline help-btn"
+        data-toggle="modal"
+        data-target="#helpModal"
+        style="margin-left: 95px;"> Help </button>
+    </a>
+    <div class="collapse navbar-collapse"
+      id="navbarsExampleDefault">
+      <ul class="navbar-nav mr-auto"></ul>
+      <div class="form-inline mt-2 mt-md-0">
+        <label class="form-check-label"
+          style="color: white;">
+          <input class="form-check-input"
+            type="checkbox"
+            id="dtr-control"> DTR </label>
+        <label class="form-check-label"
+          style="padding:10px; color: white;">
+          <input class="form-check-input"
+            type="checkbox"
+            id="rts-control"> RTS </label>
+        <button class="btn btn-outline options-btn"
+          data-toggle="modal"
+          data-target="#options-modal"
+          style="margin-right: 5px;"> Options </button>
+        <select class="custom-select mb-2 mr-sm-2 mb-sm-0"
+          id="device-select">
+          <option value="-1" selected="selected">No Serial Ports</option>
+        </select>
+        <button class="btn btn-outline-success my-2 my-sm-0"
+          id="connect">Connect</button>
+      </div>
+    </div>
+  </nav>
+  <!-- Options Modal-->
+  <div id="options-modal"
+    class="modal fade"
+    role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Options</h4>
+            <button type="button"
+              class="close"
+              data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="btn-group-vertical" style="width:100%">
+              <label class="form-check-label">
+                <input class="form-check-input"
+                  disabled
+                  type="checkbox"
+                  value="telemetry"
+                  id="graph-switch"> Graph </label>
+              <label class="form-check-label">
+                <input class="form-check-input"
+                  disabled
+                  type="checkbox"
+                  value="telemetry"
+                  id="telemetry-on"
+                  checked> Telemetry </label>
+              <label class="form-check-label">
+                <input class="form-check-input"
+                  type="checkbox"
+                  value="dark-theme"
+                  id="dark-theme"> Dark Theme </label>
+              <label class="form-check-label">
+                <input class="form-check-input"
+                  disabled
+                  type="checkbox"
+                  value="reset"
+                  id="reset-on-connect"
+                  checked> Reset On Connect </label>
+              <div class="input-group" style="margin-bottom: 10px">
+                <input type="text"
+                  class="form-control"
+                  placeholder="Enter Chrome Serial ID here"
+                  id="chrome-app-id" />
+                <span class="input-group-btn">
+                  <button id="save-and-refresh-page"
+                    onclick="location.reload();"
+                    class="btn btn-secondary btn-outline-info"
+                    type="button">Save &amp; Refresh Page</button>
+                </span>
+              </div>
+              <button id="clear-cache-modal-open"
+                class="btn btn-outline-danger clear-btn"> Clear Command History
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Help Modal -->
+  <div id="helpModal"
+    class="modal fade"
+    role="dialog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">How to Use Telemetry</h4>
+          <button type="button"
+            class="close"
+            data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <h4>Connecting Your Device</h4>
+          <ol>
+            <li>Connect device to USB port</li>
+            <li>Press "Refresh List" on navbarto update list of devices
+              connected</li>
+            <li>Using the dropdown menu next to the connect button, connect to
+              the corresponding COM or TTY serial device number and press
+              Connect.</li>
+          </ol>
+          <h4>Serial Baud Select</h4>
+          <ul>
+            <li>Baud rates select the rate at which bits are sent and received
+              from Telemetry to your device.</li>
+            <li> 1 Baud represents one bit of information transferred per
+              second.</li>
+          </ul>
+          <h4>Carriage Return (CR) and New Line (NL) Selectors</h4>
+          <ul>
+            <li>Having CR checked sends a carriage return command at the end of
+              your string of text.</li>
+            <li>Having NL checked sends a new line command at the end of your
+              string of text.</li>
+          </ul>
+          <h4>Dark Theme</h4>
+          <ul>
+            <li>Selecting this changes the interface to a dark mode.</li>
+          </ul>
+          <h4>Telemetry Selector</h4>
+          <ul>
+            <li>Having Telemetry checked enables the Telemetry features, and
+              allows you to interact with your variables in real time.</li>
+          </ul>
+          <h4>Graph Selector</h4>
+          <ul>
+            <li>Having Graph checked enables data sent from your device to be
+              graphed in real time.</li>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button"
+            class="btn btn-default"
+            data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container-fluid pt-4"
+    style="height: 97.5%">
+    <div class="row"
+      style="height: 100%">
+      <main class="col-sm-12 col-md-12 col-lg-12"
+        id="serial-output-section"
+        style="z-index: 1; position: absolute;">
+        <div style="display: inherit;">
+          <h2>Serial Output</h2>
+          <select style="margin-left: 15px"
+            class="custom-select mb-2 mr-sm-2 mb-sm-0"
+            id="serial-baud-select">
+            <option value="110">110 baud</option>
+            <option value="150">150 baud</option>
+            <option value="300">300 baud</option>
+            <option value="1200">1200 baud</option>
+            <option value="2400">2400 baud</option>
+            <option value="4800">4800 baud</option>
+            <option value="9600">9600 baud</option>
+            <option value="19200">19200 baud</option>
+            <option value="38400" selected>38400 baud</option>
+            <option value="57600">57600 baud</option>
+            <option value="115200">115200 baud</option>
+            <option value="230400">230400 baud</option>
+            <option value="460800">460800 baud</option>
+            <option value="921600">921600 baud</option>
+          </select>
+        </div>
+        <hr>
+        <div class="input-group"
+          style="margin-bottom: 10px">
+          <input type="text"
+            class="form-control"
+            list="command-history"
+            placeholder="Write Serial Data Here ..."
+            id="serial-input">
+          <datalist id="command-history"></datalist>
+          <span class="input-group-btn">
+            <button class="btn btn-outline-warning help-btn"
+            data-toggle="modal"
+            data-target="#serial-file-modal"
+            type="button"> Upload File </button>
+          </span>
+          <span class="input-group-addon">
+            <input type="checkbox"
+              id="carriage-return-select">
+            <span>&nbsp;CR</span>
+          </span>
+          <span class="input-group-addon">
+            <input type="checkbox"
+              id="newline-select"
+              checked><span>&nbsp;NL</span>
+          </span>
+          <span class="input-group-btn">
+            <button id="serial-send"
+              class="btn btn-secondary btn-outline-info"
+              type="button">Send</button>
+          </span>
+        </div>
+        <div id="terminal"
+          style="height:80%"></div>
+        <button id="clear-button"
+          class="btn btn-outline-warning clear-btn">Clear Console</button>
+        <textarea disabled
+          id="serial-output"
+          style="display:none"
+          class="form-control fill"></textarea>
+      </main>
+    </div>
+  </div>
+  <!-- Clear Command History Cache Modal -->
+  <div class="modal fade"
+    id="clear-cache-modal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="clear-cache-modalLabel">
+    <div class="modal-dialog"
+      role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title"
+            id="clear-cache-modalLabel">Clear Command History Cache?</h4>
+          <button type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to clear the command history?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button"
+            id="clear-command-cache"
+            class="btn btn-danger"
+            data-dismiss="modal">Yes, Clear Command History</button>
+          <button type="button"
+            class="btn btn-default"
+            data-dismiss="modal"> Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- File Upload Modal-->
+  <div class="modal fade"
+    id="serial-file-modal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="serial-file-modalLabel">
+    <div class="modal-dialog"
+      role="document">
+      <div class="modal-content">
+        <div class="modal-header">Upload File To Current Device</h4>
+          <button type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <input type="file"
+                class="form-control-file"
+                accept=".txt, .hex"
+                id="serial-file" />
+            </div>
+          </form>
+          <div id="alert-display"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button"
+            id="serial-upload"
+            class="btn btn-primary">Upload</button>
+          <button type="button"
+            class="btn btn-default"
+            data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js"></script>
+  <script src="web-app-resources/lib/bootstrap-4.0.0-alpha.6/js/jquery.min.js"></script>
+  <script src="web-app-resources/lib/bootstrap-4.0.0-alpha.6/js/tether.min.js"></script>
+  <script src="web-app-resources/lib/bootstrap-4.0.0-alpha.6/js/bootstrap.min.js"></script>
+  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+  <script src="web-app-resources/lib/bootstrap-4.0.0-alpha.6/js/ie10-viewport-bug-workaround.js"></script>
+  <script src="web-app-resources/lib/highcharts/highstock.js"></script>
+  <script src="web-app-resources/lib/highcharts/exporting.js"></script>
+  <script src="web-app-resources/lib/export-csv-master/export-csv.js"></script>
+  <script src="web-app-resources/highchart-options.js"></script>
+  <script src="web-app-resources/lib/xterm/dist/xterm.js"></script>
+  <script src="web-app-resources/lib/xterm/dist/addons/fit/fit.js"></script>
+  <script src="web-app-resources/flags.js"></script>
+  <script src="web-app-resources/term.js"></script>
+  <script src="web-app-resources/main.js"></script>
+</body>
+
+</html>
