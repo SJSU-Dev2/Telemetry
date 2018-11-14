@@ -273,7 +273,8 @@ $("#serial-send").on("click", () =>
         var cr = (carriage_return_active) ? "1" : "0";
         var nl = (newline_active) ? "1" : "0";
 
-        $.get(`${URL}/write/${payload}/${cr}/${nl}`, function(data)
+        $.get(`${URL}/write/${cr}/${nl}?payload=${encodeURIComponent(key)}`,
+        function(data)
         {
             if(data === SUCCESS)
             {
@@ -345,7 +346,7 @@ $("#clear-cache-modal-open").on("click",() =>
 $("#clear-cache").on("click", () =>
 {
   command_history = [];
-  past_commands = ""; 
+  past_commands = "";
   document.getElementById('command-history').innerHTML = "";
   localStorage.setItem('command_history', JSON.stringify(command_history));
   console.info("CLEARED COMMAND HISTORY AND CACHE");
@@ -857,15 +858,24 @@ $(window).resize(() => {
 });
 
 term.on('key', function (key, ev) {
-    if(ev.code == "Backspace")
+    console.log(key, key.hexEncode(), ev);
+    switch(ev.code)
     {
+      case "Backspace":
         key = "\b";
+        break;
+      case "Home":
+        key = "\x1b7";
+        break;
+      case "End":
+        key = "\x1b8";
+        break;
     }
     if(key == "\r")
     {
         key += "\n";
     }
-    $.get(`${URL}/write/${encodeURIComponent(key)}/0/0`, function(data)
+    $.get(`${URL}/write/0/0?payload=${encodeURIComponent(key)}`, function(data)
     {
         if(data === SUCCESS)
         {
@@ -882,9 +892,21 @@ term.on('linefeed', function (key, ev) {
     console.log("linefeed!");
 });
 
-term.on('data', function (data, ev) {
-    console.log(data);
-});
+String.prototype.hexEncode = function(){
+    var hex, i;
+
+    var result = "";
+    for (i=0; i<this.length; i++) {
+        hex = this.charCodeAt(i).toString(16);
+        result += (hex).slice(-4);
+    }
+
+    return result
+}
+
+// term.on('data', function (data, ev) {
+//     console.log(data, data.hexEncode(), ev);
+// });
 
 window.onload = function()
 {

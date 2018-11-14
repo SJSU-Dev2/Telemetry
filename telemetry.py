@@ -231,9 +231,10 @@ def serial():
     serial_output = ""
     return payload
 # Serial write string (payload) to serial device
-@app.route('/write/<string:payload>/<int:carriage_return>/<int:newline>')
-def write(payload="", carriage_return=0, newline=0):
+@app.route('/write/<int:carriage_return>/<int:newline>')
+def write(carriage_return=0, newline=0):
     lock.acquire()
+    payload = request.args.get('payload')
     decoded_payload = urllib.unquote(payload).decode("ascii")
 
     cr = ""
