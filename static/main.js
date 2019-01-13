@@ -158,7 +158,7 @@ function getCommandCache()
   }
 }
 
-window.onbeforeunload => ()
+window.onbeforeunload = () =>
 {
   if (command_history.length > 100)
   {
@@ -169,7 +169,7 @@ window.onbeforeunload => ()
   else {
     localStorage.setItem('command_history', JSON.stringify(command_history));
   }
-}
+};
 
 //===================================
 //  Listeners
