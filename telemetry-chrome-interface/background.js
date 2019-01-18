@@ -156,7 +156,6 @@ chrome.runtime.onConnectExternal.addListener(port => {
     console.log(`Connection ${connect_id} has disconnected.`);
     if (!isNaN(connections[connect_id].serial_id)) {
       chrome.serial.disconnect(connections[connect_id].serial_id, nop);
-      connections[connect_id].client.postMessage({ responder: "disconnect" });
     }
     connections_changed = true;
     delete connections[connect_id];
@@ -174,10 +173,17 @@ function checkSerialPortList() {
       connections_changed = false;
 
       for (let connect_id in connections) {
-        connections[connect_id].client.postMessage({
-          responder: "list",
-          data: list
-        });
+        try {
+          connections[connect_id].client.postMessage({
+            responder: "list",
+            data: list
+          });
+        } catch (event) {
+          console.debug(event);
+          console.log("Failed to send list to connection ", connect_id);
+          console.log("Removing connection from connections list");
+          delete connections[connect_id];
+        }
       }
     }
 

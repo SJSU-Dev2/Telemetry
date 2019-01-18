@@ -1,8 +1,8 @@
 {
-    "name": "Serial",
-    "description": "Serial chrome Test App",
-    "version": "0.1",
-    "manifest_version": 2,
+    "name": "Telemetry Serial Interface",
+    "description": "A helper app to allow the Telemetry web application to communicate with serial TTY devices",
+    "version": "0.2",
+    "manifest_version": 3,
     "app": {
         "background": {
             "scripts": ["background.js"]
