@@ -1,4 +1,4 @@
-let decoder = new TextDecoder("utf-8");
+const decoder = new TextDecoder("utf-8");
 
 let connections = {
   // "connect_id": {
@@ -7,6 +7,9 @@ let connections = {
   //   serial_device_list: []
   // }
 };
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 let previous_serial_count = -1;
 let connections_changed = false;
@@ -43,13 +46,22 @@ function serialReceiveHandler(info) {
   }
 }
 
+function resetAndEmitConnect(serial_id,connect_id) {
+  chrome.serial.setControlSignals(serial_id, { dtr: true, rts: false },
+  async () => {
+    await sleep(2000);
+    chrome.serial.setControlSignals(serial_id, { dtr: false, rts: false },
+    () => {
+      connections[connect_id].client.postMessage({ responder: "connect" });
+    });
+  });
+}
+
 function serialConnectHandler(connection_info, connect_id) {
   console.debug("connection_info: ", connection_info);
   let serial_id = connection_info.connectionId;
   connections[connect_id].serial_id = serial_id;
-  chrome.serial.setControlSignals(serial_id, { dtr: false, rts: false }, () => {
-    connections[connect_id].client.postMessage({ responder: "connect" });
-  });
+  resetAndEmitConnect(serial_id, connect_id);
 }
 
 function connectionHandler(request, connect_id) {
@@ -124,17 +136,20 @@ chrome.serial.onReceive.addListener(serialReceiveHandler);
 chrome.serial.onReceiveError.addListener(event => {
   console.warn(event);
   let connect_id = getConnectIdBySerialId(event.connectionId);
-  if (event.error == "device_lost") {
-    chrome.serial.disconnect(connections[connect_id].serial_id, () => {
-      connections[connect_id].client.postMessage({ responder: "disconnect" });
-      connections[connect_id].serial_id = NaN;
-    });
-  } else {
-    console.error("Unhandled serial event occured!", event);
-    connections[getConnectIdBySerialId(event.connectionId)].client.postMessage({
-      responder: "error",
-      data: event
-    });
+  switch(event.error) {
+    case "device_lost":
+    case "system_error":
+      chrome.serial.disconnect(connections[connect_id].serial_id, () => {
+        connections[connect_id].client.postMessage({ responder: "disconnect" });
+        connections[connect_id].serial_id = NaN;
+      });
+      break;
+    default:
+      console.error("Unhandled serial event occurred!", event);
+      connections[connect_id].client.postMessage({
+        responder: "error",
+        data: event
+      });
   }
 });
 
@@ -156,7 +171,6 @@ chrome.runtime.onConnectExternal.addListener(port => {
     console.log(`Connection ${connect_id} has disconnected.`);
     if (!isNaN(connections[connect_id].serial_id)) {
       chrome.serial.disconnect(connections[connect_id].serial_id, nop);
-      connections[connect_id].client.postMessage({ responder: "disconnect" });
     }
     connections_changed = true;
     delete connections[connect_id];
@@ -164,7 +178,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
 });
 
 function checkSerialPortList() {
-  chrome.serial.getDevices((list) => {
+  chrome.serial.getDevices(async (list) => {
     let number_of_connections = Object.keys(connections).length;
 
     if (previous_serial_count != list.length || connections_changed) {
@@ -174,15 +188,37 @@ function checkSerialPortList() {
       connections_changed = false;
 
       for (let connect_id in connections) {
-        connections[connect_id].client.postMessage({
-          responder: "list",
-          data: list
-        });
+        try {
+          connections[connect_id].client.postMessage({
+            responder: "list",
+            data: list
+          });
+        } catch (event) {
+          console.debug(event);
+          console.log("Failed to send list to connection ", connect_id);
+          console.log("Removing connection from connections list");
+          delete connections[connect_id];
+        }
       }
     }
 
-    setTimeout(checkSerialPortList, 1000);
+    await sleep(100);
+    checkSerialPortList();
   });
 }
 
 checkSerialPortList();
+
+chrome.runtime.onMessageExternal.addListener(
+  (message, sender, sendResponse) => {
+    if (message == "version") {
+      const manifest = chrome.runtime.getManifest();
+      sendResponse({
+        type: "success",
+        version: manifest.version
+      });
+      return true;
+    }
+    return false;
+  }
+);

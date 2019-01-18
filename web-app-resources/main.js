@@ -3,8 +3,10 @@
 //===================================
 let device_connected = false;
 let history_position = 0;
+let command_history = [];
+const CHROME_EXTENSION_ID = "fmbgflhmjkcgohkhjobldjjgpbgpljdl";
 const flags = new Flags();
-const change_event = new Event('change');
+const change_event = new Event("change");
 const collator = new Intl.Collator(undefined, {
   numeric: true,
   sensitivity: "base"
@@ -12,7 +14,7 @@ const collator = new Intl.Collator(undefined, {
 //===================================
 //  Parsers & Generator Functions
 //===================================
-function randomString(length) {
+function GenerateConnectionId(length) {
   return Math.random()
     .toString(36)
     .slice(2);
@@ -40,7 +42,7 @@ function generateDropDownList(port_info) {
   for (let i = 0; i < paths.length; i++) {
     html += `
       <option value="${paths[i]}"
-      ${paths[i] === selected ? "selected=\"selected\"" : ""}>
+      ${paths[i] === selected ? 'selected="selected"' : ""}>
           ${paths[i]}
       </option>`;
   }
@@ -84,7 +86,7 @@ document.querySelector("#connect").addEventListener("click", () => {
     data: {
       path: device,
       settings: {
-        bitrate: parseInt(flags.get("serial-baud-select"))
+        bitrate: parseInt(flags.get("baudrate"))
       }
     }
   });
@@ -116,24 +118,19 @@ document.querySelector("#serial-input").addEventListener("keyup", event => {
       break;
   }
   if (count_change_flag) {
-    command_string = command_history[command_history.length - history_position];
-    document.querySelector("#serial-input").value = command_string;
+    let command = command_history[command_history.length - history_position];
+    if (command) {
+      document.querySelector("#serial-input").value = command;
+    }
   }
 });
 
 document.querySelector("#serial-send").addEventListener("click", () => {
-  if (!device_connected) {
-    console.warn("No device connected, message not sent!");
-    return;
-  }
-
   let payload = $("#serial-input").val();
   $("#serial-input").val("");
 
   if (payload !== command_history[command_history.length - 1]) {
-    let command_history = flags.get("command-history");
     command_history.push(payload);
-    flags.set(command_history);
   }
 
   history_position = 0;
@@ -212,9 +209,7 @@ function chromeAppMessageHandler(response) {
         .removeClass("btn-outline-success")
         .addClass("btn-outline-danger")
         .text("Disconnect");
-      document
-        .querySelector("#serial-baud-select")
-        .setAttribute("disabled", "disabled");
+      document.querySelector("#baudrate").setAttribute("disabled", "disabled");
       document
         .querySelector("#device-select")
         .setAttribute("disabled", "disabled");
@@ -228,7 +223,7 @@ function chromeAppMessageHandler(response) {
         .addClass("btn-outline-success")
         .removeClass("btn-outline-danger")
         .text("Connect");
-      document.querySelector("#serial-baud-select").removeAttribute("disabled");
+      document.querySelector("#baudrate").removeAttribute("disabled");
       document.querySelector("#device-select").removeAttribute("disabled");
       $("#refresh").click();
       break;
@@ -280,34 +275,50 @@ function commandHistoryUpdateHandler(command_list) {
   console.debug("Command history updated");
 }
 
-flags.attach("serial-baud-select", "change", "\"38400\"");
-flags.attach("dtr-control", "change", "false", RtsDtrControlHandler);
-flags.attach("rts-control", "change", "false", RtsDtrControlHandler);
+flags.attach("baudrate", "change", "38400");
+flags.attach("dtr-control", "change", false, RtsDtrControlHandler);
+flags.attach("rts-control", "change", false, RtsDtrControlHandler);
 flags.attach("reset-on-connect", "change");
 flags.attach("carriage-return-select", "change");
 flags.attach("newline-select", "change");
-flags.attach("dark-theme", "change", "false", ApplyDarkTheme, ApplyDarkTheme);
+flags.attach("dark-theme", "change", false, ApplyDarkTheme, ApplyDarkTheme);
 flags.attach("device-select", "change");
 flags.attach("chrome-app-id", "change");
-flags.bind("command-history", commandHistoryUpdateHandler);
+flags.bind("command-history", commandHistoryUpdateHandler, []);
 
 function main() {
   term.open(document.querySelector("#terminal"));
   term.fit();
 
   flags.initialize();
-  try {
-    serial_extension = chrome.runtime.connect(
-      flags.get("chrome-app-id"),
-      { name: randomString() }
-    );
-    serial_extension.onMessage.addListener(chromeAppMessageHandler);
-  } catch (event) {
-    console.log(event);
-    // TODO(#): replace this with a modal
-    // alert("Could not connect to chrome app. Please go to " +
-    //       "https://github.com/kammce/Telemetry and install the chrome app.");
+  let app_id = flags.get("chrome-app-id");
+  console.debug("chrome-app-id = ", app_id);
+
+  if (!app_id) {
+    app_id = CHROME_EXTENSION_ID;
+    console.debug("Using CHROME_EXTENSION_ID:", app_id);
   }
+  // Check the version of the app, and if a valid respones comes back, attempt
+  // to connect to the app.
+  chrome.runtime.sendMessage(app_id, "version", (response) => {
+    if (response) {
+      serial_extension = chrome.runtime.connect(
+        app_id,
+        { name: GenerateConnectionId() }
+      );
+      let app_connection = document.querySelector("#app-connection-indicator");
+      app_connection.classList.remove("disconnected-text");
+      app_connection.classList.add("connected-text");
+      serial_extension.onMessage.addListener(chromeAppMessageHandler);
+    } else {
+      $("#not-connected-modal").modal("show");
+      serial_extension = {
+        postMessage: () => {
+          $("#not-connected-modal").modal("show");
+        }
+      };
+    }
+  });
 }
 
 window.onbeforeunload = () => {
@@ -319,6 +330,7 @@ window.onbeforeunload = () => {
   return null;
 };
 window.addEventListener("resize", () => {
-  term.fit()
+  term.fit();
 });
+// Entry point of software start
 window.addEventListener("load", main);
