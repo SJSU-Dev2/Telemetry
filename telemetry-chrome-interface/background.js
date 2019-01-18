@@ -1,4 +1,4 @@
-let decoder = new TextDecoder("utf-8");
+const decoder = new TextDecoder("utf-8");
 
 let connections = {
   // "connect_id": {

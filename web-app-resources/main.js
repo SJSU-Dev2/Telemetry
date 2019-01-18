@@ -4,8 +4,9 @@
 let device_connected = false;
 let history_position = 0;
 let command_history = [];
+const CHROME_EXTENSION_ID = "fmbgflhmjkcgohkhjobldjjgpbgpljdl";
 const flags = new Flags();
-const change_event = new Event('change');
+const change_event = new Event("change");
 const collator = new Intl.Collator(undefined, {
   numeric: true,
   sensitivity: "base"
@@ -13,7 +14,7 @@ const collator = new Intl.Collator(undefined, {
 //===================================
 //  Parsers & Generator Functions
 //===================================
-function randomString(length) {
+function GenerateConnectionId(length) {
   return Math.random()
     .toString(36)
     .slice(2);
@@ -41,7 +42,7 @@ function generateDropDownList(port_info) {
   for (let i = 0; i < paths.length; i++) {
     html += `
       <option value="${paths[i]}"
-      ${paths[i] === selected ? "selected=\"selected\"" : ""}>
+      ${paths[i] === selected ? 'selected="selected"' : ""}>
           ${paths[i]}
       </option>`;
   }
@@ -118,7 +119,7 @@ document.querySelector("#serial-input").addEventListener("keyup", event => {
   }
   if (count_change_flag) {
     let command = command_history[command_history.length - history_position];
-    if(command) {
+    if (command) {
       document.querySelector("#serial-input").value = command;
     }
   }
@@ -208,9 +209,7 @@ function chromeAppMessageHandler(response) {
         .removeClass("btn-outline-success")
         .addClass("btn-outline-danger")
         .text("Disconnect");
-      document
-        .querySelector("#baudrate")
-        .setAttribute("disabled", "disabled");
+      document.querySelector("#baudrate").setAttribute("disabled", "disabled");
       document
         .querySelector("#device-select")
         .setAttribute("disabled", "disabled");
@@ -276,6 +275,23 @@ function commandHistoryUpdateHandler(command_list) {
   console.debug("Command history updated");
 }
 
+function chromeAppConnectHandler() {
+  let app_connection = document.querySelector("#app-connection-indicator");
+  app_connection.classList.remove("disconnected-text");
+  app_connection.classList.add("connected-text");
+  serial_extension.onMessage.addListener(chromeAppMessageHandler);
+}
+
+function chromeAppDisconnectHandler() {
+  console.log(event);
+  $("#not-connected-modal").modal("show");
+  serial_extension = {
+    postMessage: () => {
+      $("#not-connected-modal").modal("show");
+    }
+  };
+}
+
 flags.attach("baudrate", "change", "38400");
 flags.attach("dtr-control", "change", false, RtsDtrControlHandler);
 flags.attach("rts-control", "change", false, RtsDtrControlHandler);
@@ -293,26 +309,23 @@ function main() {
 
   flags.initialize();
   try {
-    serial_extension = chrome.runtime.connect(
-      flags.get("chrome-app-id"),
-      { name: randomString() }
-    );
-    serial_extension.onMessage.addListener(chromeAppMessageHandler);
+    let app_id = flags.get("chrome-app-id");
 
-    let app_connection = document.querySelector("#app-connection-indicator");
-    app_connection.classList.remove("disconnected-text");
-    app_connection.classList.add("connected-text");
+    console.debug("app_id", app_id);
+
+    if (!app_id) {
+      app_id = CHROME_EXTENSION_ID;
+      console.debug("CHROME_EXTENSION_ID used!");
+    }
+
+    serial_extension = chrome.runtime.connect(
+      app_id,
+      { name: GenerateConnectionId() }
+    );
+    serial_extension.onConnect.addListener(chromeAppConnectHandler);
+    serial_extension.onDisconnect.addListener(chromeAppDisconnectHandler);
   } catch (event) {
-    console.log(event);
-    $("#not-connected-modal").modal("show");
-    serial_extension = {
-      postMessage: () => {
-        $("#not-connected-modal").modal("show");
-      }
-    };
-    // TODO(#): replace this with a modal
-    // alert("Could not connect to chrome app. Please go to " +
-    //       "https://github.com/kammce/Telemetry and install the chrome app.");
+    chromeAppDisconnectHandler();
   }
 }
 
@@ -325,7 +338,7 @@ window.onbeforeunload = () => {
   return null;
 };
 window.addEventListener("resize", () => {
-  term.fit()
+  term.fit();
 });
 // Entry point of software start
 window.addEventListener("load", main);
