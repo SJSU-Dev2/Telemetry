@@ -146,13 +146,17 @@ chrome.serial.onReceiveError.addListener(event => {
       });
       break;
     case "system_error":
-      chrome.serial.connect(
-        connections[connect_id]["serial_connect_data"].path,
-        connections[connect_id]["serial_connect_data"].settings,
-        (serial_info) => {
-          serialConnectHandler(serial_info, connect_id);
-        }
-      );
+      chrome.serial.disconnect(connections[connect_id].serial_id, () => {
+        chrome.serial.connect(
+          connections[connect_id]["serial_connect_data"].path,
+          connections[connect_id]["serial_connect_data"].settings,
+          (serial_info) => {
+            serialConnectHandler(serial_info, connect_id);
+          });
+      });
+      break;
+    case "overrun":
+      chrome.serial.setPaused(event.connectionId, false, nop);
       break;
     default:
       console.error("Unhandled serial event occurred!", event);
