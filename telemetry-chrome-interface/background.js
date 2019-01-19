@@ -3,6 +3,7 @@ const decoder = new TextDecoder("utf-8");
 let connections = {
   // "connect_id": {
   //   serial_id: NaN,
+  //   serial_path: "",
   //   client: port,
   //   serial_device_list: []
   // }
@@ -80,6 +81,7 @@ function connectionHandler(request, connect_id) {
         request.data.path,
         request.data.settings,
         (serial_info) => {
+          connections[connect_id]["serial_connect_data"] = request.data;
           serialConnectHandler(serial_info, connect_id);
         }
       );
@@ -138,11 +140,19 @@ chrome.serial.onReceiveError.addListener(event => {
   let connect_id = getConnectIdBySerialId(event.connectionId);
   switch(event.error) {
     case "device_lost":
-    case "system_error":
       chrome.serial.disconnect(connections[connect_id].serial_id, () => {
         connections[connect_id].client.postMessage({ responder: "disconnect" });
         connections[connect_id].serial_id = NaN;
       });
+      break;
+    case "system_error":
+      chrome.serial.connect(
+        connections[connect_id]["serial_connect_data"].path,
+        connections[connect_id]["serial_connect_data"].settings,
+        (serial_info) => {
+          serialConnectHandler(serial_info, connect_id);
+        }
+      );
       break;
     default:
       console.error("Unhandled serial event occurred!", event);
