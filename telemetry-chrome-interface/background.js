@@ -49,7 +49,7 @@ function serialReceiveHandler(info) {
 function resetAndEmitConnect(serial_id,connect_id) {
   chrome.serial.setControlSignals(serial_id, { dtr: true, rts: false },
   async () => {
-    await sleep(2000);
+    await sleep(100);
     chrome.serial.setControlSignals(serial_id, { dtr: false, rts: false },
     () => {
       connections[connect_id].client.postMessage({ responder: "connect" });
