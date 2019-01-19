@@ -275,23 +275,6 @@ function commandHistoryUpdateHandler(command_list) {
   console.debug("Command history updated");
 }
 
-function chromeAppConnectHandler() {
-  let app_connection = document.querySelector("#app-connection-indicator");
-  app_connection.classList.remove("disconnected-text");
-  app_connection.classList.add("connected-text");
-  serial_extension.onMessage.addListener(chromeAppMessageHandler);
-}
-
-function chromeAppDisconnectHandler() {
-  console.log(event);
-  $("#not-connected-modal").modal("show");
-  serial_extension = {
-    postMessage: () => {
-      $("#not-connected-modal").modal("show");
-    }
-  };
-}
-
 flags.attach("baudrate", "change", "38400");
 flags.attach("dtr-control", "change", false, RtsDtrControlHandler);
 flags.attach("rts-control", "change", false, RtsDtrControlHandler);
@@ -308,25 +291,34 @@ function main() {
   term.fit();
 
   flags.initialize();
-  try {
-    let app_id = flags.get("chrome-app-id");
+  let app_id = flags.get("chrome-app-id");
+  console.debug("chrome-app-id = ", app_id);
 
-    console.debug("app_id", app_id);
-
-    if (!app_id) {
-      app_id = CHROME_EXTENSION_ID;
-      console.debug("CHROME_EXTENSION_ID used!");
-    }
-
-    serial_extension = chrome.runtime.connect(
-      app_id,
-      { name: GenerateConnectionId() }
-    );
-    serial_extension.onConnect.addListener(chromeAppConnectHandler);
-    serial_extension.onDisconnect.addListener(chromeAppDisconnectHandler);
-  } catch (event) {
-    chromeAppDisconnectHandler();
+  if (!app_id) {
+    app_id = CHROME_EXTENSION_ID;
+    console.debug("Using CHROME_EXTENSION_ID:", app_id);
   }
+  // Check the version of the app, and if a valid respones comes back, attempt
+  // to connect to the app.
+  chrome.runtime.sendMessage(app_id, "version", (response) => {
+    if (response) {
+      serial_extension = chrome.runtime.connect(
+        app_id,
+        { name: GenerateConnectionId() }
+      );
+      let app_connection = document.querySelector("#app-connection-indicator");
+      app_connection.classList.remove("disconnected-text");
+      app_connection.classList.add("connected-text");
+      serial_extension.onMessage.addListener(chromeAppMessageHandler);
+    } else {
+      $("#not-connected-modal").modal("show");
+      serial_extension = {
+        postMessage: () => {
+          $("#not-connected-modal").modal("show");
+        }
+      };
+    }
+  });
 }
 
 window.onbeforeunload = () => {
