@@ -140,19 +140,10 @@ chrome.serial.onReceiveError.addListener(event => {
   let connect_id = getConnectIdBySerialId(event.connectionId);
   switch(event.error) {
     case "device_lost":
+    case "system_error":
       chrome.serial.disconnect(connections[connect_id].serial_id, () => {
         connections[connect_id].client.postMessage({ responder: "disconnect" });
         connections[connect_id].serial_id = NaN;
-      });
-      break;
-    case "system_error":
-      chrome.serial.disconnect(connections[connect_id].serial_id, () => {
-        chrome.serial.connect(
-          connections[connect_id]["serial_connect_data"].path,
-          connections[connect_id]["serial_connect_data"].settings,
-          (serial_info) => {
-            serialConnectHandler(serial_info, connect_id);
-          });
       });
       break;
     case "overrun":
