@@ -6,13 +6,14 @@ let term = new Terminal({
   bellStyle: "sound",
   cursorBlink: true,
   lineHeight: 1,
-  fontFamily: "monospace",
+  fontSize: 18,
+  fontFamily: "Ubuntu Mono, courier-new, courier, monospace",
   scrollback: 1024,
 });
 
 term.on('key', function (key, event) {
   key = (event.code == "Backspace") ? "\b" : key;
-  key = (event.code == "\r") ? "\n" : key;
+  key = (event.code == "Enter") ? "\n" : key;
   serial_extension.postMessage({
     "command": "write",
     "data": key
