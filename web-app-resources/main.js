@@ -300,26 +300,37 @@ function main() {
   }
   // Check the version of the app, and if a valid respones comes back, attempt
   // to connect to the app.
-  chrome.runtime.sendMessage(app_id, "version", (response) => {
-    if (response) {
-      serial_extension = chrome.runtime.connect(
-        app_id,
-        { name: GenerateConnectionId() }
-      );
-      let app_connection = document.querySelector("#app-connection-indicator");
-      app_connection.classList.remove("disconnected-text");
-      app_connection.classList.add("connected-text");
-      serial_extension.onMessage.addListener(chromeAppMessageHandler);
-    } else {
-      $("#not-connected-modal").modal("show");
-      serial_extension = {
-        postMessage: () => {
-          $("#not-connected-modal").modal("show");
-        }
-      };
-    }
-  });
-}
+  try
+  {
+    chrome.runtime.sendMessage(app_id, "version", (response) => {
+      if (response) {
+        serial_extension = chrome.runtime.connect(
+          app_id,
+          { name: GenerateConnectionId() }
+        );
+        let app_connection = document.querySelector("#app-connection-indicator");
+        app_connection.classList.remove("disconnected-text");
+        app_connection.classList.add("connected-text");
+        serial_extension.onMessage.addListener(chromeAppMessageHandler);
+      } else {
+        $("#not-connected-modal").modal("show");
+        serial_extension = {
+          postMessage: () => {
+            $("#not-connected-modal").modal("show");
+          }
+        };
+      }
+    });
+  } catch (e) {
+    $("#not-connected-modal").modal("show");
+    serial_extension = {
+      postMessage: () => {
+        $("#not-connected-modal").modal("show");
+      }
+    };
+  }
+
+  }
 
 window.onbeforeunload = () => {
   let command_history = flags.get("command-history");
