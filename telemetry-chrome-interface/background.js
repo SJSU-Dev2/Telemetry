@@ -1,5 +1,3 @@
-const decoder = new TextDecoder("utf-8");
-
 let connections = {
   // "connect_id": {
   //   serial_id: NaN,
@@ -18,6 +16,10 @@ let connections_changed = false;
 function nop() {}
 
 function convertStringToArrayBuffer(str) {
+  if (str instanceof Uint8Array)
+  {
+    return str;
+  }
   let buf = new ArrayBuffer(str.length);
   let bufView = new Uint8Array(buf);
   for (let i = 0; i < str.length; i++) {
@@ -39,10 +41,9 @@ function serialReceiveHandler(info) {
   console.debug(info);
   let connect_id = getConnectIdBySerialId(info.connectionId);
   if (info.data && connect_id) {
-    console.log();
     connections[getConnectIdBySerialId(info.connectionId)].client.postMessage({
       responder: "read",
-      data: decoder.decode(info.data)
+      data: Array.from(new Uint8Array(info.data))
     });
   }
 }
@@ -122,10 +123,7 @@ function connectionHandler(request, connect_id) {
       break;
     case "write":
       chrome.serial.send(
-        connections[connect_id].serial_id,
-        convertStringToArrayBuffer(request.data),
-        nop
-      );
+        connections[connect_id].serial_id, new Uint8Array(request.data), nop);
       break;
     default:
       console.warn(`Invalid Command ${request.command}`);

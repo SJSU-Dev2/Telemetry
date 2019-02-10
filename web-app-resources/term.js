@@ -14,9 +14,10 @@ let term = new Terminal({
 term.on('key', function (key, event) {
   key = (event.code == "Backspace") ? "\b" : key;
   key = (event.code == "Enter") ? "\n" : key;
+  const encoder = new TextEncoder("utf-8");
   serial_extension.postMessage({
     "command": "write",
-    "data": key
+    "data": Array.from(encoder.encode(key))
   });
 });
 

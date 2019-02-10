@@ -27,6 +27,7 @@
 </head>
 
 <body>
+  <progress id="hyperload-progress" value="0.0" max="1.0"></progress>
   <nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
     <button class="navbar-toggler navbar-toggler-right hidden-lg-up"
       type="button"
@@ -39,7 +40,7 @@
     </button>
     <a class="navbar-brand"
       href="#"> Telemetry <span class='supsub'>
-        <sup class='superscript'>version 1.2</sup>
+        <sup class='superscript'>version 1.4</sup>
         <sub class="subscript disconnected-text"
           id="app-connection-indicator"></sub>
       </span>
@@ -207,7 +208,8 @@
     <div class="modal-dialog modal-md">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title">Chrome App Is Not Connected</h4>
+          <h4 class="modal-title" id="chrome-app-title">
+            Chrome App Is Not Connected</h4>
           <button type="button"
             class="close"
             data-dismiss="modal">&times;</button>
@@ -265,9 +267,20 @@
             <option value="460800">460800 baud</option>
             <option value="921600">921600 baud</option>
           </select>
-
-        <button id="clear-button"
-          class="btn btn-outline-warning">Clear Console</button>
+          <div class="form-group" style="margin-bottom: 0px; margin-left: 10px">
+            <input type="file" class="file form-control-file" style="margin-left: 15px"
+            accept=".bin" id="hyperload-file" />
+            <div class="input-group col-xs-12">
+              <span class="input-group-btn">
+                <button id="hyperload-button"
+                  class="btn btn-outline-danger help-btn">Hyperload</button>
+              </span>
+              <input type="text" class="form-control input-lg" disabled placeholder="Select firmware .bin file">
+              <span class="input-group-btn">
+                <button class="browse btn btn-outline-info input-lg" type="button"><i class="glyphicon glyphicon-search"></i> Browse</button>
+              </span>
+            </div>
+          </div>
         </div>
         <hr>
         <div class="input-group"
@@ -278,6 +291,10 @@
             placeholder="Write Serial Data Here ..."
             id="serial-input">
           <datalist id="command-history"></datalist>
+          <span class="input-group-btn">
+            <button id="clear-button"
+            class="btn btn-sm btn-outline-warning">Clear Console</button>
+          </span>
           <span class="input-group-btn">
             <button class="btn btn-outline-warning help-btn"
             data-toggle="modal"
@@ -392,6 +409,7 @@
   <script src="web-app-resources/lib/xterm/dist/addons/fit/fit.js"></script>
   <script src="web-app-resources/flags.js"></script>
   <script src="web-app-resources/term.js"></script>
+  <script src="web-app-resources/Hyperload.js"></script>
   <script src="web-app-resources/main.js"></script>
 </body>
 

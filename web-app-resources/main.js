@@ -4,6 +4,8 @@
 let device_connected = false;
 let history_position = 0;
 let command_history = [];
+const decoder = new TextDecoder("utf-8");
+const encoder = new TextEncoder("utf-8");
 const CHROME_EXTENSION_ID = "fmbgflhmjkcgohkhjobldjjgpbgpljdl";
 const flags = new Flags();
 const change_event = new Event("change");
@@ -11,9 +13,12 @@ const collator = new Intl.Collator(undefined, {
   numeric: true,
   sensitivity: "base"
 });
+const APP_VERSION = "0.4";
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 //===================================
 //  Parsers & Generator Functions
-//===================================
 function GenerateConnectionId(length) {
   return Math.random()
     .toString(36)
@@ -86,7 +91,8 @@ document.querySelector("#connect").addEventListener("click", () => {
     data: {
       path: device,
       settings: {
-        bitrate: parseInt(flags.get("baudrate"))
+        bitrate: parseInt(flags.get("baudrate")),
+        bufferSize: 32768,
       }
     }
   });
@@ -138,9 +144,11 @@ document.querySelector("#serial-send").addEventListener("click", () => {
   let cr = flags.get("carriage-return-select") ? "\r" : "";
   let nl = flags.get("newline-select") ? "\n" : "";
 
+  console.log(`${payload}${cr}${nl}\n\n\n`);
+
   serial_extension.postMessage({
     command: "write",
-    data: `${payload}${cr}${nl}`
+    data: Array.from(encoder.encode(`${payload}${cr}${nl}`))
   });
 });
 
@@ -164,6 +172,36 @@ document.querySelector("#clear-command-cache").addEventListener("click", () => {
   flags.set("command-history", [
     /* empty array */
   ]);
+});
+
+async function asyncPostMessage(payload)
+{
+  return new Promise(resolve => {
+    serial_extension.postMessage(payload);
+    resolve();
+  });
+}
+
+const progress_bar = document.querySelector("#hyperload-progress");
+
+document.querySelector("#hyperload-button").addEventListener("click", () => {
+  let serial_file = document.querySelector("#hyperload-file").files;
+  let file = serial_file.item(0);
+  let reader = new FileReader();
+
+  // This event listener will be fired once reader.readAsText() finishes
+  reader.onload = async () => {
+    console.debug(reader);
+    let application_binary = new Uint8Array(reader.result);
+    let success = await Hyperload(asyncPostMessage, application_binary, progress_bar);
+    console.log("Hyperload finished!");
+    if(!success)
+    {
+      alert("Hyperload failed to program board. Please try again!");
+    }
+  };
+  // Initiate reading of uploaded file
+  reader.readAsArrayBuffer(file);
 });
 
 //Serial File Upload
@@ -196,7 +234,6 @@ document.querySelector("#serial-upload").addEventListener("click", () => {
 //  Initialize everything
 //===================================
 function chromeAppMessageHandler(response) {
-  console.debug(response);
   switch (response.responder) {
     case "list":
       const list_html = generateDropDownList(response.data);
@@ -230,7 +267,13 @@ function chromeAppMessageHandler(response) {
     case "update":
       break;
     case "read":
-      term.write(response.data.replace(/\n/g, "\r\n"));
+      let str = decoder.decode(new Uint8Array(response.data).buffer);
+      if (hyperload_activated) {
+        serial_controller.feed(response.data);
+      } else {
+        str = str.replace(/\n/g, "\r\n");
+        term.write(str);
+      }
       break;
     default:
       console.warn("Unknown response");
@@ -280,7 +323,7 @@ flags.attach("dtr-control", "change", false, RtsDtrControlHandler);
 flags.attach("rts-control", "change", false, RtsDtrControlHandler);
 flags.attach("reset-on-connect", "change");
 flags.attach("carriage-return-select", "change");
-flags.attach("newline-select", "change");
+flags.attach("newline-select", "change", true);
 flags.attach("dark-theme", "change", false, ApplyDarkTheme, ApplyDarkTheme);
 flags.attach("device-select", "change");
 flags.attach("chrome-app-id", "change");
@@ -303,7 +346,7 @@ function main() {
   try
   {
     chrome.runtime.sendMessage(app_id, "version", (response) => {
-      if (response) {
+      if (response.version.toString() == APP_VERSION) {
         serial_extension = chrome.runtime.connect(
           app_id,
           { name: GenerateConnectionId() }
@@ -313,6 +356,7 @@ function main() {
         app_connection.classList.add("connected-text");
         serial_extension.onMessage.addListener(chromeAppMessageHandler);
       } else {
+        $("#chrome-app-title").text("Chrome App Out of Date!");
         $("#not-connected-modal").modal("show");
         serial_extension = {
           postMessage: () => {
@@ -323,14 +367,22 @@ function main() {
     });
   } catch (e) {
     $("#not-connected-modal").modal("show");
+    $("#chrome-app-title").text("Chrome App Is Not Connected!");
     serial_extension = {
       postMessage: () => {
         $("#not-connected-modal").modal("show");
       }
     };
   }
+}
 
-  }
+$(document).on('click', '.browse', function(){
+  var file = $(this).parent().parent().parent().find('.file');
+  file.trigger('click');
+});
+$(document).on('change', '.file', function(){
+  $(this).parent().find('.form-control').val($(this).val().replace(/C:\\fakepath\\/i, ''));
+});
 
 window.onbeforeunload = () => {
   let command_history = flags.get("command-history");
