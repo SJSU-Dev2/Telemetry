@@ -13,11 +13,10 @@ function sleep(ms) {
 let previous_serial_count = -1;
 let connections_changed = false;
 
-function nop() {}
+function nop() { }
 
 function convertStringToArrayBuffer(str) {
-  if (str instanceof Uint8Array)
-  {
+  if (str instanceof Uint8Array) {
     return str;
   }
   let buf = new ArrayBuffer(str.length);
@@ -48,15 +47,15 @@ function serialReceiveHandler(info) {
   }
 }
 
-function resetAndEmitConnect(serial_id,connect_id) {
+function resetAndEmitConnect(serial_id, connect_id) {
   chrome.serial.setControlSignals(serial_id, { dtr: true, rts: false },
-  async () => {
-    await sleep(100);
-    chrome.serial.setControlSignals(serial_id, { dtr: false, rts: false },
-    () => {
-      connections[connect_id].client.postMessage({ responder: "connect" });
+    async () => {
+      await sleep(100);
+      chrome.serial.setControlSignals(serial_id, { dtr: false, rts: false },
+        () => {
+          connections[connect_id].client.postMessage({ responder: "connect" });
+        });
     });
-  });
 }
 
 function serialConnectHandler(connection_info, connect_id) {
@@ -107,7 +106,7 @@ function connectionHandler(request, connect_id) {
     case "disconnect":
       console.debug(
         `Disconnect attempt on id '${connect_id}' on serial device id '${
-          connections[connect_id].serial_id
+        connections[connect_id].serial_id
         }'`
       );
       chrome.serial.disconnect(connections[connect_id].serial_id, () => {
@@ -118,6 +117,13 @@ function connectionHandler(request, connect_id) {
       chrome.serial.update(
         connections[connect_id].serial_id,
         request.data.settings,
+        nop
+      );
+      break;
+    case "pause":
+      chrome.serial.setPaused(
+        connections[connect_id].serial_id,
+        request.data.pause,
         nop
       );
       break;
@@ -136,7 +142,7 @@ chrome.serial.onReceive.addListener(serialReceiveHandler);
 chrome.serial.onReceiveError.addListener(event => {
   console.warn(event);
   let connect_id = getConnectIdBySerialId(event.connectionId);
-  switch(event.error) {
+  switch (event.error) {
     case "device_lost":
     case "system_error":
       chrome.serial.disconnect(connections[connect_id].serial_id, () => {
@@ -145,6 +151,7 @@ chrome.serial.onReceiveError.addListener(event => {
       });
       break;
     case "overrun":
+    case "break":
       chrome.serial.setPaused(event.connectionId, false, nop);
       break;
     default:

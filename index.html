@@ -44,7 +44,7 @@
         <sub class="subscript disconnected-text"
           id="app-connection-indicator"></sub>
       </span>
-      <button class="btn btn-outline help-btn"
+      <button class="btn btn-outline-warning"
         data-toggle="modal"
         data-target="#helpModal"
         style="margin-left: 95px;"> Help </button>
@@ -249,35 +249,41 @@
         style="z-index: 1; position: absolute;">
         <div style="display: inherit;">
           <h2>Serial Output</h2>
-          <select style="margin-left: 15px"
-            class="custom-select mb-2 mr-sm-2 mb-sm-0"
-            id="baudrate">
-            <option value="110">110 baud</option>
-            <option value="150">150 baud</option>
-            <option value="300">300 baud</option>
-            <option value="1200">1200 baud</option>
-            <option value="2400">2400 baud</option>
-            <option value="4800">4800 baud</option>
-            <option value="9600">9600 baud</option>
-            <option value="19200">19200 baud</option>
-            <option value="38400" selected>38400 baud</option>
-            <option value="57600">57600 baud</option>
-            <option value="115200">115200 baud</option>
-            <option value="230400">230400 baud</option>
-            <option value="460800">460800 baud</option>
-            <option value="921600">921600 baud</option>
-          </select>
+
+          <div class="form-group" style="margin-bottom: 0px; margin-left: 10px">
+            <select style="margin-left: 15px"
+              class="custom-select mb-2 mr-sm-2 mb-sm-0"
+              id="baudrate">
+              <option value="110">110 baud</option>
+              <option value="150">150 baud</option>
+              <option value="300">300 baud</option>
+              <option value="1200">1200 baud</option>
+              <option value="2400">2400 baud</option>
+              <option value="4800">4800 baud</option>
+              <option value="9600">9600 baud</option>
+              <option value="19200">19200 baud</option>
+              <option value="38400" selected>38400 baud</option>
+              <option value="57600">57600 baud</option>
+              <option value="115200">115200 baud</option>
+              <option value="230400">230400 baud</option>
+              <option value="460800">460800 baud</option>
+              <option value="921600">921600 baud</option>
+            </select>
+            <button id="clear-button"
+            class="btn btn-outline-warning">Clear Console</button>
+          </div>
+
           <div class="form-group" style="margin-bottom: 0px; margin-left: 10px">
             <input type="file" class="file form-control-file" style="margin-left: 15px"
             accept=".bin" id="hyperload-file" />
             <div class="input-group col-xs-12">
               <span class="input-group-btn">
                 <button id="hyperload-button"
-                  class="btn btn-outline-danger help-btn">Hyperload</button>
+                  class="btn btn-outline-info">Hyperload Flash</button>
               </span>
-              <input type="text" class="form-control input-lg" disabled placeholder="Select firmware .bin file">
+              <input type="text" class="form-control input-sm" disabled placeholder="Select firmware.bin">
               <span class="input-group-btn">
-                <button class="browse btn btn-outline-info input-lg" type="button"><i class="glyphicon glyphicon-search"></i> Browse</button>
+                <button id="hyperload-browse" class="browse btn btn-outline-primary input-lg" type="button"><i class="glyphicon glyphicon-search"></i> Browse</button>
               </span>
             </div>
           </div>
@@ -292,12 +298,9 @@
             id="serial-input">
           <datalist id="command-history"></datalist>
           <span class="input-group-btn">
-            <button id="clear-button"
-            class="btn btn-sm btn-outline-warning">Clear Console</button>
-          </span>
-          <span class="input-group-btn">
-            <button class="btn btn-outline-warning help-btn"
+            <button class="btn btn-outline-primary"
             data-toggle="modal"
+            id="file-upload-modal-button"
             data-target="#serial-file-modal"
             type="button"> Upload File </button>
           </span>
