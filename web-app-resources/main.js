@@ -346,7 +346,7 @@ function main() {
   try
   {
     chrome.runtime.sendMessage(app_id, "version", (response) => {
-      if (response.version.toString() == APP_VERSION) {
+      if (response && response.version.toString() == APP_VERSION) {
         serial_extension = chrome.runtime.connect(
           app_id,
           { name: GenerateConnectionId() }
