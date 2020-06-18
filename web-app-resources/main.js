@@ -58,18 +58,6 @@ function generateDropDownList(port_info)
   return html;
 }
 
-function generateCommandListHtml(command_list)
-{
-  if (!command_list) {
-    return "";
-  }
-
-  let html = "";
-  for (let command of command_list) {
-    html += `<option value="${command}" />`;
-  }
-  return html;
-}
 //===================================
 //  Connect to Chrome App
 //===================================
@@ -145,6 +133,7 @@ document.querySelector("#serial-send").addEventListener("click", () =>
 
   if (payload !== command_history[command_history.length - 1]) {
     command_history.push(payload);
+    flags.set("command-history", command_history.slice(0, 99));
   }
 
   history_position = 0;
@@ -354,11 +343,9 @@ function ApplyDarkTheme(dark_theme_active)
   }
 }
 
-function commandHistoryUpdateHandler(command_list)
+function commandHistoryUpdateHandler()
 {
-  let command_history_element = document.querySelector("#command-history");
-  command_history_element.innerHTML = generateCommandListHtml(command_list);
-  console.debug("Command history updated");
+  command_history = flags.get("command-history");
 }
 
 flags.attach("baudrate", "change", "38400");
@@ -427,24 +414,17 @@ $(document).on('click', '.browse', function ()
   var file = $(this).parent().parent().parent().find('.file');
   file.trigger('click');
 });
+
 $(document).on('change', '.file', function ()
 {
   $(this).parent().find('.form-control')
     .val($(this).val().replace(/C:\\fakepath\\/i, ''));
 });
 
-window.onbeforeunload = () =>
-{
-  let command_history = flags.get("command-history");
-  if (command_history) {
-    flags.set("command-history", command_history.slice(0, 99));
-  }
-  flags.teardown();
-  return null;
-};
 window.addEventListener("resize", () =>
 {
   term.fit();
 });
+
 // Entry point of software start
 window.addEventListener("load", main);

@@ -3,28 +3,30 @@ class Flags {
     this.model = {};
   }
   //sets localStorage when value is changed
-  setCache(cname, cvalue)
-  {
+  setCache(cname, cvalue) {
     localStorage.setItem(cname, JSON.stringify(cvalue));
   }
-  cachedValueExists(cname)
-  {
+
+  cachedValueExists(cname) {
     return (localStorage.getItem(cname) != null) ? true : false;
   }
-  getCache(cname)
-  {
+
+  getCache(cname) {
     let cached_data = localStorage.getItem(cname);
     return (cached_data !== "undefined") ? JSON.parse(cached_data) : null;
   }
+
   get(id) {
     return this.model[id]["data"];
   }
+
   bind(id, update_callback, default_value) {
-    this.model[id] = {
-      "data": default_value,
-      "change_event": update_callback,
-    };
+    // this.model[id] = {
+    //   "data": default_value,
+    //   "change_event": update_callback,
+    // };
   }
+
   attach(id, event_type, default_value, element_callback, update_callback) {
     let element = document.querySelector(`#${id}`);
     // If element doesn't exist do not attempt to attach flag listeners to it
@@ -41,8 +43,13 @@ class Flags {
     element.addEventListener(event_type, () => {
       // Get value of element and remove quotes with
       var val = element[property];
-      // Save the value to the IDs name in LocalStorage
+
+      // Save the value to the IDs name in local model
       this.model[id]["data"] = val;
+
+      // Save value to local storage
+      this.setCache(id, this.model[id]["data"]);
+
       // Call their element_callback if it exists
       if (element_callback) {
         element_callback(val, element);
@@ -59,12 +66,16 @@ class Flags {
 
     this.bind(id, input_updater, default_value);
   }
+
   set(id, value) {
     this.model[id] = value;
+    this.setCache(id, this.model[id]["data"]);
+
     if (typeof this.model[id]["change_event"] === "function") {
       this.model[id]["change_event"](value, id);
     }
   }
+
   initialize() {
     console.debug("Initializing Flags!");
     for (var id in this.model) {
@@ -77,11 +88,12 @@ class Flags {
       }
     }
   }
+
   teardown() {
     console.debug("Saving flags to LocalStorage!");
     for (var id in this.model) {
       if (typeof this.model[id]["data"] !== "undefined" &&
-          this.model[id]["data"] !== null) {
+        this.model[id]["data"] !== null) {
         this.setCache(id, this.model[id]["data"]);
       }
     }
