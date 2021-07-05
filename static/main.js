@@ -216,6 +216,7 @@ $("#connect").on("click", () =>
                     .addClass("btn-outline-danger")
                     .text("Disconnect");
                 $("#serial-baud-select").attr("disabled", "disabled");
+                disableGraphDownload(false);
             }
             else
             {
@@ -238,6 +239,7 @@ $("#connect").on("click", () =>
                     .removeClass("btn-outline-danger")
                     .text("Connect");
                 $("#serial-baud-select").removeAttr("disabled");
+                disableGraphDownload(true);
             }
         });
     }
@@ -531,6 +533,15 @@ $("#dark-theme").on('change', function()
     }
 });
 
+$('#download-graph').click(function () {
+    var doc = new jsPDF();
+    doc.fromHTML($('#graph-holder').html(), 20, 20, {
+        'width': $('#graph-holder').width(),
+            'elementHandlers': specialElementHandlers
+    });
+    doc.save('telemetry-data-graph.pdf');
+});
+
 //===================================
 //  Parsers & Generator Functions
 //===================================
@@ -699,6 +710,11 @@ function updateGraph()
     return true;
 }
 
+function disableGraphDownload(status)
+{
+    $("#download-graph").prop("disabled", status);
+}
+
 //===================================
 //  Timer Functions
 //===================================
@@ -791,6 +807,7 @@ function getSerial()
                 $("#refresh").click();
 
                 $('#serial-disconnect-modal').modal('show');
+                disableGraphDownload(true);
             }
         });
     }
@@ -822,6 +839,12 @@ function checkConnection()
 //===================================
 
 Terminal.applyAddon(fit);
+
+var specialElementHandlers = {
+    '#bypassme': function (element, renderer) {
+        return true;
+    }
+};
 
 var term = new Terminal({
     // bellSound: "both",
